@@ -1,0 +1,15 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Személyes / API-kulcsok
+.env
+
+# Generált fájlok
+data/
+logs/
+
+# Editor / OS
+.vscode/
+.DS_Store

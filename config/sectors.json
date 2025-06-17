@@ -1,0 +1,13 @@
+{
+  "Energy": ["XOM","CVX","COP","WMB","EOG","KMI","MPC","OKE","SLB","PSX"],
+  "Materials": ["FCX","LIN","SHW","ECL","CTVA","NEM","APD","VMC","MLM","DD"],
+  "Industrials": ["GE","RTX","UBER","CAT","BA","HON","UNP","DE","GEV","ETN"],
+  "Utilities": ["NEE","SO","DUK","EXC","XEL","AEP","SRE","D","CEG","VST"],
+  "Healthcare": ["LLY","JNJ","ABBV","UNH","ABT","MRK","ISRG","TMO","AMGN","BSX"],
+  "Financials": ["BRK.B","JPM","V","MA","BAC","WFC","GS","AXP","MS","SPGI"],
+  "Consumer Discretionary": ["AMZN","TSLA","HD","BKNG","MCD","TJX","LOW","SBUX","ORLY","NKE"],
+  "Consumer Staples": ["COST","WMT","PG","KO","PM","MDLZ","MO","CL","PEP","TGT"],
+  "Information Technology": ["MSFT","AAPL","NVDA","AVGO","ORCL","PLTR","CSCO","CRM","IBM","INTU"],
+  "Communication Services": ["META","GOOGL","NFLX","GOOG","DIS","TTWO","LYV","CHTR","EA","T"],
+  "Real Estate": ["PLD","AMT","WELL","EQIX","DLR","O","SPG","PSA","CCI","CBRE"]
+}

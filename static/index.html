@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>MarketSurge RS Rating Explained</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>MarketSurge RS Rating - Leaderboard</h1>
+  <small>Data from daily Polygon snapshot.</small><br />
+  <small class="sub">
+    Purpose: Calculate MarketSurge-style Relative-Strength (RS) ratings for
+    predefined sector watch-lists using Polygon market data, then export daily
+    JSON / CSV snapshots that are transparent, auditable and Explainable-AI
+    (XAI) compliant.
+  </small>
+
+  <p id="last-updated" style="color:#697386; margin-top:.75rem;"></p>
+
+  <!-- vezérlők -->
+  <div id="controls">
+    <label>
+      Sector:
+      <select id="sector-filter"></select>
+    </label>
+
+    <input id="search-box" type="text" placeholder="Search ticker or name…" />
+  </div>
+
+  <!-- === két hasáb: bal (táblázat) | jobb (XAI + log) === -->
+  <div id="container">
+    <!-- bal oldal -->
+    <table id="rs-table">
+      <thead>
+        <tr>
+          <th>Sector</th>
+          <th>Ticker / Name</th>
+          <th style="text-align:right;">RS Rating</th>
+        </tr>
+      </thead>
+      <tbody id="body_rows"></tbody>
+    </table>
+
+    <!-- jobb oldal -->
+    <div id="side-panel">
+      <div id="explain-box">
+        <h3>Workflow &amp; Calculation (XAI)</h3>
+        <ol>
+          <li><strong>Data fetch:</strong> ≥252 daily closes per ticker from Polygon API.</li>
+          <li><strong>Returns:</strong> Rate-of-Change for 63 d, 126 d, 189 d, 252 d.</li>
+          <li><strong>Weighted score:</strong> <code>RS_factor = 0.4·ROC63 + 0.2·ROC126 + 0.2·ROC189 + 0.2·ROC252</code>.</li>
+          <li><strong>Ranking:</strong> Percentile (1–99) inside each GICS sector.</li>
+          <li><strong>Export:</strong> JSON & CSV with common <code>as_of</code> UTC timestamp.</li>
+          <li><strong>Audit log:</strong> Each run appended to <code>logs/run.log</code>.</li>
+        </ol>
+        <p><em>XAI rationale:</em> Transparent data source &amp; formula, linear
+        transformations, full audit trail.</p>
+      </div>
+
+      <div id="log-box">loading logs…</div>
+    </div>
+  </div>
+
+  <script src="rs_table.js"></script>
+</body>
+</html>
