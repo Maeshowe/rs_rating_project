@@ -1,65 +1,84 @@
 """
-RS-rating pipeline – Python 3.11+
+main.py
+~~~~~~~~
+Pipeline a napi RS-rating és RS-line frissítéséhez.
 
-1. Lekéri a napi záróárakat (Polygon)
-2. Kiszámítja az RS-faktort
-3. Szektoronként 1–99 rangsor
-4. JSON/CSV export – minden rekord tartalmazza az `as_of` UTC-időbélyeget
+Lépések:
+1) Lekéri a napi záróárakat (Polygon) minden tickerre
+2) Kiszámítja az RS-faktort és a 1–99 rangpontot szektoronként
+3) Ment:  data/rs_snapshot.json  +  data/rs_snapshot.csv
+4) Minden feldolgozott tickerre RS-line JSON-t ír:  data/rs_line_<T>.json
 """
+
+from __future__ import annotations
 
 import json
 import datetime as dt
-from pathlib import Path
 import concurrent.futures as fut
+from pathlib import Path
 
 import pandas as pd
+
 from fetch import fetch_daily_close
 from calculate import calculate_rs_factor, percentile_rank
 from export import dump
+from rs_line import save_rs_line_json
 
-# ---------------------------------------------------------------------------
-SECTORS = json.loads(Path("config/sectors.json").read_text())
-AS_OF = dt.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"  # » 2025-06-17T19:17:00Z
+# ────────────────────────────────────────────────────────────────────
+# Beállítások
+# ────────────────────────────────────────────────────────────────────
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+SECTORS = json.loads((PROJECT_ROOT / "config" / "sectors.json").read_text())
+AS_OF   = dt.datetime.now(dt.UTC).replace(microsecond=0).isoformat()  # ISO-UTC, pl. 2025-06-18T19:17:00+00:00
 MAX_WORKERS = 6
-# ---------------------------------------------------------------------------
+DATA_DIR = PROJECT_ROOT / "data"
+# ────────────────────────────────────────────────────────────────────
 
 
 def process_sector(sector: str, tickers: list[str]) -> list[dict]:
-    """Visszaadja az adott szektor rekordjait (dict-ek)."""
+    """RS-faktor + RS-rating számítás egy szektorra; üres DF esetén skip."""
     factors: dict[str, float] = {}
     for t in tickers:
         df = fetch_daily_close(t)
-        if len(df) >= 252:
-            factors[t] = calculate_rs_factor(df)
+        if df.empty or len(df) < 252:               # IPO vagy hálózati hiba
+            continue
+        factors[t] = calculate_rs_factor(df)
+
+    # ha egy ticker sem maradt, térjen vissza üres listával
+    if not factors:
+        return []
 
     rf = pd.Series(factors, name="rs_factor")
     rr = percentile_rank(rf)
 
     return [
         {
-            "sector": sector,
-            "ticker": t,
+            "sector":    sector,
+            "ticker":    t,
             "rs_factor": round(rf[t], 2),
             "rs_rating": int(rr[t]),
-            "as_of": AS_OF,  # ✨ minden rekord ugyanazt az UTC-időt kapja
+            "as_of":     AS_OF,
         }
         for t in rf.index
     ]
 
 
-def main():
+def main() -> None:
     rows: list[dict] = []
 
+    # 1) RS-rating számítás párhuzamosan
     with fut.ThreadPoolExecutor(MAX_WORKERS) as ex:
-        futures = [
-            ex.submit(process_sector, sector, tickers)
-            for sector, tickers in SECTORS.items()
-        ]
-        for f in fut.as_completed(futures):
-            rows.extend(f.result())
+        tasks = [ex.submit(process_sector, s, ts) for s, ts in SECTORS.items()]
+        for task in fut.as_completed(tasks):
+            rows.extend(task.result())
 
-    # DataFrame-ből export (JSON+CSV)
+    # 2) Export JSON + CSV
     dump(pd.DataFrame(rows))
+
+    # 3) RS-line JSON minden feldolgozott tickerre
+    tickers = {r["ticker"] for r in rows}
+    for t in tickers:
+        save_rs_line_json(t, DATA_DIR)   # (üres DF esetén skip + console-warning)
 
 
 if __name__ == "__main__":

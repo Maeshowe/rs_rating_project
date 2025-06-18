@@ -2,22 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>MarketSurge RS Rating Explained</title>
+  <title>RS Leaderboard</title>
+
+  <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Chart.js a mini RS-vonalhoz -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
-  <h1>MarketSurge RS Rating - Leaderboard</h1>
+  <h1>Leaderboard</h1>
   <small>Data from daily Polygon snapshot.</small><br />
   <small class="sub">
     Purpose: Calculate MarketSurge-style Relative-Strength (RS) ratings for
     predefined sector watch-lists using Polygon market data, then export daily
-    JSON / CSV snapshots that are transparent, auditable and Explainable-AI
-    (XAI) compliant.
+    JSON / CSV snapshots that are transparent, auditable and Explainable-AI (XAI)
+    compliant.
   </small>
 
+  <!-- UTC-időbélyeg -->
   <p id="last-updated" style="color:#697386; margin-top:.75rem;"></p>
 
-  <!-- vezérlők -->
+  <!-- Szektor-szűrő és keresőmező -->
   <div id="controls">
     <label>
       Sector:
@@ -27,40 +33,49 @@
     <input id="search-box" type="text" placeholder="Search ticker or name…" />
   </div>
 
-  <!-- === két hasáb: bal (táblázat) | jobb (XAI + log) === -->
+  <!-- ===== Két hasáb: bal (táblázat) | jobb (XAI + log) ===== -->
   <div id="container">
-    <!-- bal oldal -->
+    <!-- BAL: RS-táblázat -->
     <table id="rs-table">
       <thead>
         <tr>
           <th>Sector</th>
           <th>Ticker / Name</th>
           <th style="text-align:right;">RS Rating</th>
+          <th style="text-align:center;">RS Line</th> <!-- új oszlop -->
         </tr>
       </thead>
       <tbody id="body_rows"></tbody>
     </table>
 
-    <!-- jobb oldal -->
+    <!-- JOBB: magyarázó + log-panel -->
     <div id="side-panel">
       <div id="explain-box">
         <h3>Workflow &amp; Calculation (XAI)</h3>
         <ol>
-          <li><strong>Data fetch:</strong> ≥252 daily closes per ticker from Polygon API.</li>
+          <li><strong>Data fetch:</strong> ≥ 252 daily closes per ticker from Polygon API.</li>
           <li><strong>Returns:</strong> Rate-of-Change for 63 d, 126 d, 189 d, 252 d.</li>
-          <li><strong>Weighted score:</strong> <code>RS_factor = 0.4·ROC63 + 0.2·ROC126 + 0.2·ROC189 + 0.2·ROC252</code>.</li>
-          <li><strong>Ranking:</strong> Percentile (1–99) inside each GICS sector.</li>
-          <li><strong>Export:</strong> JSON & CSV with common <code>as_of</code> UTC timestamp.</li>
+          <li><strong>Weighted score:</strong>
+            <code>RS_factor = 0.4·ROC63 + 0.2·ROC126 + 0.2·ROC189 + 0.2·ROC252</code>.
+          </li>
+          <li><strong>Ranking:</strong> Percentile (1–99) inside each sector.</li>
+          <li><strong>RS Line:</strong> <code>Close<sub>stock</sub> ÷ Close<sub>S&amp;P 500</sub></code>,
+      normalised to 100.</li>
+          <li><strong>Sparkline colour:</strong>
+      last-60-day trend ↑ → <b style="color:#27ae60">green line</b>;
+      trend ↓ → <b style="color:#d1293d">red line</b>.</li>
+          <li><strong>Export:</strong> JSON &amp; CSV with shared <code>as_of</code> UTC timestamp.</li>
           <li><strong>Audit log:</strong> Each run appended to <code>logs/run.log</code>.</li>
         </ol>
-        <p><em>XAI rationale:</em> Transparent data source &amp; formula, linear
-        transformations, full audit trail.</p>
+        <p><em>XAI rationale:</em> Transparent inputs &amp; formula, linear transforms,
+        full audit trail.</p>
       </div>
 
       <div id="log-box">loading logs…</div>
     </div>
   </div>
 
+  <!-- Scriptek -->
   <script src="rs_table.js"></script>
 </body>
 </html>
