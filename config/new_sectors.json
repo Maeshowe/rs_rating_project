@@ -1,0 +1,45 @@
+{
+  "Consumer durables": [
+    "FSS"
+  ],
+  "Consumer services": [
+    "BYD"
+  ],
+  "Electronic technology": [
+    "APH",
+    "AVGO",
+    "ESE",
+    "HEI",
+    "SANM"
+  ],
+  "Finance": [
+    "C",
+    "GS",
+    "JPM",
+    "NDAQ"
+  ],
+  "Health services": [
+    "ENSG"
+  ],
+  "Non-energy minerals": [
+    "CRS"
+  ],
+  "Process industries": [
+    "HWKN"
+  ],
+  "Producer manufacturing": [
+    "WWD"
+  ],
+  "Technology services": [
+    "ATEN",
+    "INTU",
+    "META",
+    "MSFT",
+    "PEGA",
+    "ULS",
+    "VEEV"
+  ],
+  "Utilities": [
+    "CEG"
+  ]
+}
